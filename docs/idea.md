@@ -4,7 +4,7 @@
 
 Se trata de una aplicacion web fullstack de entretenimiento que permite a los usuarios  registrar los videojuegos que han jugado, organizarlos por estado (completado, en progreso, pendiente), puntuarlos
 
-Los datos de videojuegos se obtienen de la API pública de RAWG (rawg.io), que ofrece información detallada sobre más de 500.000 juegos: portadas, géneros, plataformas, desarrolladores y puntuaciones de Metacritic. El backend en Express gestiona la colección del usuario y la lógica de recomendación con una arquitectura por capas limpia y documentada.
+Los datos de videojuegos se obtienen de la API de **IGDB (igdb.com)**, base de datos de videojuegos mantenida por Twitch que ofrece información detallada sobre más de 200.000 juegos: portadas, géneros, plataformas, desarrolladores y puntuaciones. El backend en Express gestiona la colección del usuario y la lógica de recomendación con una arquitectura por capas limpia y documentada.
 
 ## Problemas que intenta resolver
 
