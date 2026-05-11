@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import * as admin from "firebase-admin";
-import path from "path";
 
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(
-      path.resolve(__dirname, "../../firebase-admin.json")
-    ),
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    }),
   });
 }
 
