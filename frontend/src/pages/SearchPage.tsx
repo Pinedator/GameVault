@@ -7,7 +7,7 @@ import type { Game, AddToCollectionDto } from "../types";
 export default function SearchPage() {
   const [query, setQuery] = useState("");
   const { results, loading, error, search } = useGameSearch();
-  const { addEntry } = useCollection();
+  const { addEntry, state } = useCollection();
   const [pendingGame, setPendingGame] = useState<Game | null>(null);
 
   const handleSearch = async () => {
@@ -19,17 +19,27 @@ export default function SearchPage() {
   };
 
   const confirmAdd = async () => {
-    if (!pendingGame) return;
-    const dto: AddToCollectionDto = {
-      gameId: pendingGame.id,
-      gameName: pendingGame.name,
-      backgroundImage: pendingGame.background_image,
-      genres: pendingGame.genres,
-      status: "pending",
-    };
-    await addEntry(dto);
+  if (!pendingGame) return;
+
+  const alreadyInCollection = state.entries.some(
+    (e) => e.gameId === pendingGame.id
+  );
+
+  if (alreadyInCollection) {
     setPendingGame(null);
+    return;
+  }
+
+  const dto: AddToCollectionDto = {
+    gameId: pendingGame.id,
+    gameName: pendingGame.name,
+    backgroundImage: pendingGame.background_image,
+    genres: pendingGame.genres,
+    status: "pending",
   };
+  await addEntry(dto);
+  setPendingGame(null);
+};
 
   return (
     <div
@@ -37,14 +47,27 @@ export default function SearchPage() {
       className="min-h-[calc(100vh-61px)] bg-[#0d0d0f] text-white px-4 sm:px-10 py-8 overflow-x-hidden"
     >
       {pendingGame && (
-        <Modal
-          title="Añadir juego"
-          message={`¿Añadir "${pendingGame.name}" a tu colección?`}
-          confirmLabel="Añadir"
-          onConfirm={confirmAdd}
-          onCancel={() => setPendingGame(null)}
-        />
-      )}
+  <Modal
+    title={
+      state.entries.some((e) => e.gameId === pendingGame.id)
+        ? "Ya en colección"
+        : "Añadir juego"
+    }
+    message={
+      state.entries.some((e) => e.gameId === pendingGame.id)
+        ? `"${pendingGame.name}" ya está en tu colección.`
+        : `¿Añadir "${pendingGame.name}" a tu colección?`
+    }
+    confirmLabel={
+      state.entries.some((e) => e.gameId === pendingGame.id)
+        ? "Cerrar"
+        : "Añadir"
+    }
+    onConfirm={confirmAdd}
+    onCancel={() => setPendingGame(null)}
+    hideCancel={state.entries.some((e) => e.gameId === pendingGame.id)}
+  />
+)}
 
       <h1
         style={{ fontFamily: "'Syne', sans-serif" }}

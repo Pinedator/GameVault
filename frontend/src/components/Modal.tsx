@@ -6,6 +6,7 @@ interface ModalProps {
   onConfirm: () => void;
   onCancel: () => void;
   danger?: boolean;
+  hideCancel?: boolean;
 }
 
 export default function Modal({
@@ -16,16 +17,14 @@ export default function Modal({
   onConfirm,
   onCancel,
   danger = false,
+  hideCancel = false,
 }: ModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      {/* Fondo oscuro */}
       <div
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={onCancel}
       />
-
-      {/* Modal */}
       <div className="relative bg-[#13131a] border border-[#1e1e2e] p-6 w-full max-w-sm flex flex-col gap-4">
         <h2
           style={{ fontFamily: "'Syne', sans-serif" }}
@@ -37,12 +36,14 @@ export default function Modal({
           {message}
         </p>
         <div className="flex gap-3 justify-end mt-2">
-          <button
-            onClick={onCancel}
-            className="px-5 py-2 text-xs tracking-widest uppercase border border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300 transition"
-          >
-            {cancelLabel}
-          </button>
+          {!hideCancel && (
+            <button
+              onClick={onCancel}
+              className="px-5 py-2 text-xs tracking-widest uppercase border border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300 transition"
+            >
+              {cancelLabel}
+            </button>
+          )}
           <button
             onClick={onConfirm}
             className={`px-5 py-2 text-xs tracking-widest uppercase font-medium transition ${

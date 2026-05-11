@@ -1,7 +1,10 @@
 import { Router } from "express";
 import { collectionController } from "../controllers/collection.controller";
+import { authMiddleware } from "../middlewares/auth.middleware";
 
 const router = Router();
+
+router.use(authMiddleware);
 
 router.get("/", collectionController.getAll);
 router.post("/", collectionController.add);

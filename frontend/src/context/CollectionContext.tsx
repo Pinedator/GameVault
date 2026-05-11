@@ -2,6 +2,7 @@ import { createContext, useContext, useReducer, useEffect } from "react";
 import type { ReactNode } from "react";
 import type { CollectionEntry, AddToCollectionDto, UpdateCollectionDto } from "../types";
 import { collectionApi } from "../api/collection.api";
+import { useAuth } from "./AuthContext";
 
 interface CollectionState {
   entries: CollectionEntry[];
@@ -60,13 +61,19 @@ export function CollectionProvider({ children }: { children: ReactNode }) {
     error: null,
   });
 
-  useEffect(() => {
-    dispatch({ type: "SET_LOADING" });
-    collectionApi
-      .getAll()
-      .then((entries) => dispatch({ type: "SET_ENTRIES", payload: entries }))
-      .catch((err: Error) => dispatch({ type: "SET_ERROR", payload: err.message }));
-  }, []);
+  const { user } = useAuth();
+
+useEffect(() => {
+  if (!user) {
+    dispatch({ type: "SET_ENTRIES", payload: [] });
+    return;
+  }
+  dispatch({ type: "SET_LOADING" });
+  collectionApi
+    .getAll()
+    .then((entries) => dispatch({ type: "SET_ENTRIES", payload: entries }))
+    .catch((err: Error) => dispatch({ type: "SET_ERROR", payload: err.message }));
+}, [user]);
 
   const addEntry = async (data: AddToCollectionDto) => {
     const entry = await collectionApi.add(data);

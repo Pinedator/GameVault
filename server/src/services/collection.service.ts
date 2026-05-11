@@ -1,17 +1,13 @@
 import { collectionRepository } from "../repositories/collection.repository";
-import { CollectionEntry, AddToCollectionDto, UpdateCollectionDto } from "../types";
-import { randomUUID } from "crypto";
+import type { CollectionEntry, AddToCollectionDto, UpdateCollectionDto } from "../types";
 
 export const collectionService = {
-  getAll: (): CollectionEntry[] => {
-    return collectionRepository.getAll();
+  getAll: async (userId: string): Promise<CollectionEntry[]> => {
+    return collectionRepository.getAll(userId);
   },
 
-  add: (dto: AddToCollectionDto): CollectionEntry => {
-    const entries = collectionRepository.getAll();
-
-    const newEntry: CollectionEntry = {
-      id: randomUUID(),
+  add: async (userId: string, dto: AddToCollectionDto): Promise<CollectionEntry> => {
+    return collectionRepository.add(userId, {
       gameId: dto.gameId,
       gameName: dto.gameName,
       backgroundImage: dto.backgroundImage,
@@ -19,28 +15,14 @@ export const collectionService = {
       status: dto.status,
       rating: dto.rating ?? null,
       note: dto.note ?? null,
-      addedAt: new Date().toISOString(),
-    };
-
-    entries.push(newEntry);
-    collectionRepository.save(entries);
-    return newEntry;
+    });
   },
 
-  update: (id: string, dto: UpdateCollectionDto): CollectionEntry => {
-    const entries = collectionRepository.getAll();
-    const index = entries.findIndex((e) => e.id === id);
-    if (index === -1) throw new Error("Entry not found");
-
-    entries[index] = { ...entries[index], ...dto };
-    collectionRepository.save(entries);
-    return entries[index];
+  update: async (userId: string, id: string, dto: UpdateCollectionDto): Promise<CollectionEntry> => {
+    return collectionRepository.update(id, userId, dto);
   },
 
-  remove: (id: string): void => {
-    const entries = collectionRepository.getAll();
-    const filtered = entries.filter((e) => e.id !== id);
-    if (filtered.length === entries.length) throw new Error("Entry not found");
-    collectionRepository.save(filtered);
+  remove: async (userId: string, id: string): Promise<void> => {
+    return collectionRepository.remove(id, userId);
   },
 };
