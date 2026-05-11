@@ -1,14 +1,25 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { LogOut } from "lucide-react";
 
 export default function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
 
   const links = [
     { to: "/", label: "Inicio" },
-    { to: "/search", label: "Buscar" },
-    { to: "/collection", label: "Mi Colección" },
+    ...(user ? [
+      { to: "/search", label: "Buscar" },
+      { to: "/collection", label: "Mi Colección" },
+    ] : []),
   ];
 
   return (
@@ -27,7 +38,7 @@ export default function Navbar() {
         </button>
 
         {/* Links escritorio */}
-        <div className="hidden md:flex gap-8">
+        <div className="hidden md:flex items-center gap-8">
           {links.map((link) => (
             <Link
               key={link.to}
@@ -41,6 +52,23 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-gray-500 hover:text-red-400 transition text-sm tracking-widest uppercase"
+            >
+              <LogOut size={14} />
+              Salir
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 text-xs tracking-widest uppercase transition"
+            >
+              Entrar
+            </Link>
+          )}
         </div>
       </div>
 
@@ -61,6 +89,22 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="text-left text-sm tracking-widest uppercase text-gray-500 hover:text-red-400 transition"
+            >
+              Salir
+            </button>
+          ) : (
+            <Link
+              to="/login"
+              onClick={() => setMenuOpen(false)}
+              className="text-sm tracking-widest uppercase text-purple-400"
+            >
+              Entrar
+            </Link>
+          )}
         </div>
       )}
     </nav>

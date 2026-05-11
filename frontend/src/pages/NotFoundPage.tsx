@@ -4,7 +4,7 @@ export default function NotFoundPage() {
   return (
     <div
       style={{ fontFamily: "'Inter', sans-serif" }}
-      className="min-h-screen bg-[#0d0d0f] text-white flex flex-col items-center justify-center relative overflow-hidden"
+      className="min-h-[calc(100vh-61px)] bg-[#0d0d0f] text-white flex flex-col items-center justify-center relative overflow-hidden"
     >
       {/* Grid decorativo */}
       <div

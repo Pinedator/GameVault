@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useCollection } from "../context/CollectionContext";
+import Modal from "../components/Modal";
 import type { CollectionStatus } from "../types";
+import StarRating from "../components/StarRating";
+import { Clock, Gamepad2, CheckCircle } from "lucide-react";
 
 const STATUS_LABELS: Record<CollectionStatus, string> = {
   completed: "Completado",
@@ -17,15 +20,18 @@ const STATUS_COLORS: Record<CollectionStatus, string> = {
 export default function CollectionPage() {
   const { state, updateEntry, removeEntry } = useCollection();
   const [filter, setFilter] = useState<CollectionStatus | "all">("all");
+  const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
   const filtered =
     filter === "all"
       ? state.entries
       : state.entries.filter((e) => e.status === filter);
 
+  const entryToDelete = state.entries.find((e) => e.id === pendingDelete);
+
   if (state.loading)
     return (
-      <div className="min-h-screen bg-[#0d0d0f] text-white flex items-center justify-center">
+      <div className="min-h-[calc(100vh-61px)] bg-[#0d0d0f] text-white flex items-center justify-center">
         <p className="text-gray-600 text-sm tracking-widest uppercase animate-pulse">
           Cargando colección...
         </p>
@@ -35,8 +41,23 @@ export default function CollectionPage() {
   return (
     <div
       style={{ fontFamily: "'Inter', sans-serif" }}
-      className="min-h-screen bg-[#0d0d0f] text-white px-4 sm:px-10 py-8 overflow-x-hidden"
+      className="min-h-[calc(100vh-61px)] bg-[#0d0d0f] text-white px-4 sm:px-10 py-8 overflow-x-hidden"
     >
+      {pendingDelete && entryToDelete && (
+        <Modal
+          title="Eliminar juego"
+          message={`¿Eliminar "${entryToDelete.gameName}" de tu colección? Esta acción no se puede deshacer.`}
+          confirmLabel="Eliminar"
+          cancelLabel="Cancelar"
+          danger
+          onConfirm={async () => {
+            await removeEntry(pendingDelete);
+            setPendingDelete(null);
+          }}
+          onCancel={() => setPendingDelete(null)}
+        />
+      )}
+
       <h1
         style={{ fontFamily: "'Syne', sans-serif" }}
         className="text-4xl sm:text-5xl tracking-widest text-white mb-2"
@@ -52,11 +73,10 @@ export default function CollectionPage() {
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`px-4 py-2 text-xs tracking-widest uppercase border transition-all duration-200 ${
-              filter === s
-                ? "bg-purple-600 border-purple-600 text-white"
-                : "border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300"
-            }`}
+            className={`px-4 py-2 text-xs tracking-widest uppercase border transition-all duration-200 ${filter === s
+              ? "bg-purple-600 border-purple-600 text-white"
+              : "border-gray-700 text-gray-500 hover:border-gray-500 hover:text-gray-300"
+              }`}
           >
             {s === "all" ? "Todos" : STATUS_LABELS[s]}
           </button>
@@ -98,34 +118,48 @@ export default function CollectionPage() {
               )}
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 gap-2">
-                <select
-                  value={entry.status}
-                  onChange={(e) =>
-                    updateEntry(entry.id, {
-                      status: e.target.value as CollectionStatus,
-                    })
-                  }
-                  className="w-full bg-[#1e1e2e] border border-gray-700 text-white px-2 py-1.5 text-xs"
-                >
-                  <option value="pending">⏳ Pendiente</option>
-                  <option value="playing">🎮 Jugando</option>
-                  <option value="completed">✅ Completado</option>
-                </select>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-3 gap-2">
 
-                <input
-                  type="number"
-                  min={1}
-                  max={10}
-                  placeholder="Puntuación 1-10"
-                  value={entry.rating ?? ""}
-                  onChange={(e) =>
-                    updateEntry(entry.id, { rating: Number(e.target.value) })
-                  }
-                  className="w-full bg-[#1e1e2e] border border-gray-700 text-white px-2 py-1.5 text-xs placeholder-gray-600"
-                />
+                  {/* Selector de estado */}
+                  <div className="flex gap-1">
+                    {(["pending", "playing", "completed"] as const).map((s) => {
+                      const icons = {
+                        pending: <Clock size={14} />,
+                        playing: <Gamepad2 size={14} />,
+                        completed: <CheckCircle size={14} />,
+                      };
+                      return (
+                        <button
+                          key={s}
+                          onClick={() => updateEntry(entry.id, { status: s })}
+                          title={s === "pending" ? "Pendiente" : s === "playing" ? "Jugando" : "Completado"}
+                          className={`flex-1 py-2 flex items-center justify-center border transition ${entry.status === s
+                              ? "bg-purple-600 border-purple-600 text-white"
+                              : "border-gray-700 text-gray-500 hover:border-purple-500 hover:text-white"
+                            }`}
+                        >
+                          {icons[s]}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Estrellas */}
+                  <StarRating
+                    value={entry.rating}
+                    onChange={(rating) => updateEntry(entry.id, { rating })}
+                  />
+
+                  <button
+                    onClick={() => setPendingDelete(entry.id)}
+                    className="w-full border border-red-800 text-red-400 hover:bg-red-900/30 py-1.5 text-xs tracking-widest uppercase transition"
+                  >
+                    Eliminar
+                  </button>
+                </div>
 
                 <button
-                  onClick={() => removeEntry(entry.id)}
+                  onClick={() => setPendingDelete(entry.id)}
                   className="w-full border border-red-800 text-red-400 hover:bg-red-900/30 py-1.5 text-xs tracking-widest uppercase transition"
                 >
                   Eliminar

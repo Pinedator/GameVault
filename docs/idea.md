@@ -18,7 +18,7 @@ Los jugadores consumen juegos en múltiples plataformas (Steam, PlayStation, Xbo
 
 ## Funcionalidades principales
 
-- **Búsqueda de videojuegos** en tiempo real usando la API de RAWG |
+- **Búsqueda de videojuegos** en tiempo real usando la API de 'Inter', sans-serif |
 - **Añadir juego a la colección** con estado (Completado / En progreso / Pendiente) y puntuaci(1–10) |
 - **Vista de colección personal** con filtros por estado, género y plataforma |
 - **Detalle de juego**: portada, descripción, géneros, plataformas, desarrollador y Metacritic score |

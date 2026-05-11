@@ -4,7 +4,7 @@ export default function HomePage() {
   return (
     <div
       style={{ fontFamily: "'Inter', sans-serif" }}
-      className="min-h-screen bg-[#0d0d0f] text-white flex flex-col items-center justify-center relative overflow-hidden px-6"
+      className="h-[calc(100vh-61px)] bg-[#0d0d0f] text-white flex flex-col items-center justify-center relative overflow-hidden px-6"
     >
       <div className="absolute inset-0 bg-gradient-to-b from-purple-950/20 via-transparent to-transparent pointer-events-none" />
       <div
@@ -15,14 +15,14 @@ export default function HomePage() {
         }}
       />
 
-      <div className="relative z-10 flex flex-col items-center gap-6 text-center w-full max-w-2xl">
+      <div className="relative z-10 flex flex-col items-center gap-5 text-center w-full max-w-2xl">
         <p className="text-purple-400 text-xs tracking-[0.3em] uppercase">
           Tu colección. Tu criterio.
         </p>
 
         <h1
           style={{ fontFamily: "'Syne', sans-serif" }}
-          className="text-6xl sm:text-8xl md:text-9xl tracking-widest text-white leading-none"
+          className="text-5xl sm:text-7xl md:text-9xl tracking-normal sm:tracking-widest text-white leading-none"
         >
           GAME<span className="text-purple-500">VAULT</span>
         </h1>
@@ -47,7 +47,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      <div className="absolute bottom-8 text-gray-700 text-xs tracking-widest uppercase">
+      <div className="absolute bottom-6 text-gray-700 text-xs tracking-widest uppercase">
         Powered by IGDB
       </div>
     </div>

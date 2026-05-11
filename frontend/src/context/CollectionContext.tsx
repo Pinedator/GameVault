@@ -60,17 +60,13 @@ export function CollectionProvider({ children }: { children: ReactNode }) {
     error: null,
   });
 
- /* useEffect(() => {
+  useEffect(() => {
     dispatch({ type: "SET_LOADING" });
     collectionApi
       .getAll()
       .then((entries) => dispatch({ type: "SET_ENTRIES", payload: entries }))
       .catch((err: Error) => dispatch({ type: "SET_ERROR", payload: err.message }));
-  }, []);*/
-
-  useEffect(() => {
-  dispatch({ type: "SET_ENTRIES", payload: [] });
-}, []);
+  }, []);
 
   const addEntry = async (data: AddToCollectionDto) => {
     const entry = await collectionApi.add(data);
@@ -83,9 +79,10 @@ export function CollectionProvider({ children }: { children: ReactNode }) {
   };
 
   const removeEntry = async (id: string) => {
-    await collectionApi.remove(id);
-    dispatch({ type: "REMOVE_ENTRY", payload: id });
-  };
+  await collectionApi.remove(id);
+  const entries = await collectionApi.getAll();
+  dispatch({ type: "SET_ENTRIES", payload: entries });
+};
 
   return (
     <CollectionContext.Provider value={{ state, addEntry, updateEntry, removeEntry }}>

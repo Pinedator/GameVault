@@ -1,34 +1,51 @@
 import { useState } from "react";
 import { useGameSearch } from "../hooks/useGameSearch";
 import { useCollection } from "../context/CollectionContext";
+import Modal from "../components/Modal";
 import type { Game, AddToCollectionDto } from "../types";
 
 export default function SearchPage() {
   const [query, setQuery] = useState("");
   const { results, loading, error, search } = useGameSearch();
   const { addEntry } = useCollection();
+  const [pendingGame, setPendingGame] = useState<Game | null>(null);
 
   const handleSearch = async () => {
     await search(query);
   };
 
-  const handleAdd = async (game: Game) => {
+  const handleAdd = (game: Game) => {
+    setPendingGame(game);
+  };
+
+  const confirmAdd = async () => {
+    if (!pendingGame) return;
     const dto: AddToCollectionDto = {
-      gameId: game.id,
-      gameName: game.name,
-      backgroundImage: game.background_image,
-      genres: game.genres,
+      gameId: pendingGame.id,
+      gameName: pendingGame.name,
+      backgroundImage: pendingGame.background_image,
+      genres: pendingGame.genres,
       status: "pending",
     };
     await addEntry(dto);
-    alert(`${game.name} añadido a tu colección`);
+    setPendingGame(null);
   };
 
   return (
     <div
       style={{ fontFamily: "'Inter', sans-serif" }}
-      className="min-h-screen bg-[#0d0d0f] text-white px-4 sm:px-10 py-8 overflow-x-hidden"
+      className="min-h-[calc(100vh-61px)] bg-[#0d0d0f] text-white px-4 sm:px-10 py-8 overflow-x-hidden"
     >
+      {pendingGame && (
+        <Modal
+          title="Añadir juego"
+          message={`¿Añadir "${pendingGame.name}" a tu colección?`}
+          confirmLabel="Añadir"
+          onConfirm={confirmAdd}
+          onCancel={() => setPendingGame(null)}
+        />
+      )}
+
       <h1
         style={{ fontFamily: "'Syne', sans-serif" }}
         className="text-4xl sm:text-5xl tracking-widest text-white mb-2"
