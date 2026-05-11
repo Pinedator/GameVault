@@ -19,10 +19,8 @@ app.use("/api/collection", collectionRoutes);
 
 app.use(errorHandler);
 
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    console.log(`🎮 GameVault server running on http://localhost:${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`🎮 GameVault server running on http://localhost:${PORT}`);
+});
 
 export default app;
